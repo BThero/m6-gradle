@@ -3,6 +3,7 @@ package com.exercises.m6gradle;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -14,14 +15,19 @@ public class TodoController {
         todos = new ArrayList<>();
     }
 
-    @GetMapping("/inbox/items")
-    public Todo createNew() {
-        Todo res = new Todo(counter.incrementAndGet(), "todo");
+    @GetMapping("/todos")
+    public List<Todo> getAll() {
+        return todos;
+    }
+
+    @PostMapping("/todos")
+    public Todo createNew(@RequestBody String status) {
+        Todo res = new Todo(counter.incrementAndGet(), status != null ? status : "to do");
         todos.add(res);
         return res;
     }
 
-    @GetMapping("/inbox/items/{id}")
+    @GetMapping("/todos/{id}")
     public Todo getOne(@PathVariable Long id) {
         for (Todo todo : todos) {
             if (todo.id() == id) {
@@ -32,11 +38,11 @@ public class TodoController {
         return null;
     }
 
-    @PostMapping("/inbox/items/{id}")
-    public String update(@PathVariable Long id, @RequestBody Todo newTodo) {
+    @PostMapping("/todos/{id}")
+    public String update(@PathVariable Long id, @RequestBody String status) {
         for (int i = 0; i < todos.size(); i++) {
             if (todos.get(i).id() == id) {
-                todos.set(i, newTodo);
+                todos.set(i, new Todo(id, status));
                 return "Success";
             }
         }
